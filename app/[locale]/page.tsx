@@ -26,7 +26,7 @@ export default async function HomePage({
   {/* Background Image */}
   <div className="relative h-[70vh] sm:h-[80vh] lg:h-[90vh] w-full">
     <Image
-      src="/images/drov1.png"
+      src="/images/drov2.png"
       alt="Premium health and beauty products from DROV"
       fill
       priority
