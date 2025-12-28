@@ -8,6 +8,7 @@ export const messages: any = {
       heroTitle: "Feel Better. Look Better.",
       heroSubtitle: "Premium health & beauty products from DROV.",
       heroButtonShop: "Shop Now",
+      navAbout: "About"
     },
   
     ku: {

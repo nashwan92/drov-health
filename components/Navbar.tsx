@@ -9,6 +9,9 @@ import { useAuth } from "@/lib/useAuth";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { t } from "@/lib/translations";
 
+import Image from "next/image";
+
+
 export default function Navbar({ locale }: { locale: string }) {
   const pathname = usePathname();
   const { user, loading } = useAuth();
@@ -35,9 +38,7 @@ export default function Navbar({ locale }: { locale: string }) {
   useEffect(() => {
     if (!open || !menuRef.current) return;
 
-    const focusable = menuRef.current.querySelectorAll<HTMLElement>(
-      'a, button'
-    );
+    const focusable = menuRef.current.querySelectorAll<HTMLElement>("a, button");
     focusable[0]?.focus();
 
     const trap = (e: KeyboardEvent) => {
@@ -74,12 +75,27 @@ export default function Navbar({ locale }: { locale: string }) {
       {/* ===== NAVBAR ===== */}
       <header className="bg-white border-b sticky top-0 z-50">
         <nav className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href={`/${locale}`} className="text-2xl font-bold text-pink-600">
-            DROV
-          </Link>
+          
+          
+
+
+<Link
+  href={`/${locale}`}
+  className="flex items-center"
+  aria-label="DROV Home"
+>
+  <Image
+    src="/logo/d-logo.png"
+    alt="DROV Logo"
+    width={140}
+    height={40}
+    priority
+    className="h-10 w-auto object-contain"
+  />
+</Link>
 
           {/* Desktop menu */}
-          <ul className="hidden md:flex gap-8 text-lg font-medium">
+          <ul className="hidden md:flex gap-8 text-lg font-medium items-center">
             <Link href={`/${locale}`} className={linkClass(`/${locale}`)}>
               {t(locale, "navHome")}
             </Link>
@@ -97,9 +113,19 @@ export default function Navbar({ locale }: { locale: string }) {
             </Link>
 
             {!loading && user && (
-              <Link href={`/${locale}/dashboard`} className="text-blue-600 font-semibold">
-                Dashboard
-              </Link>
+              <>
+                <Link href={`/${locale}/dashboard`} className="text-blue-600 font-semibold">
+                  Dashboard
+                </Link>
+
+                {/* ✅ Logout (desktop) */}
+                <button
+                  onClick={handleLogout}
+                  className="ml-4 rounded-full border px-4 py-1 text-sm hover:bg-slate-100 transition"
+                >
+                  Logout
+                </button>
+              </>
             )}
           </ul>
 
@@ -163,38 +189,30 @@ export default function Navbar({ locale }: { locale: string }) {
                 <Link
                   key={key}
                   href={`/${locale}${path}`}
-                  className={`${
+                  className={
                     pathname === `/${locale}${path}`
                       ? "text-pink-600 font-semibold"
                       : ""
-                  }`}
+                  }
                 >
                   {t(locale, key) ?? key}
                 </Link>
               ))}
 
               {!loading && user && (
-                <Link href={`/${locale}/dashboard`} className="text-blue-600 font-semibold">
-                  Dashboard
-                </Link>
-              )}
+                <>
+                  <Link href={`/${locale}/dashboard`} className="text-blue-600 font-semibold">
+                    Dashboard
+                  </Link>
 
-              {!loading && !user && (
-                <Link
-                  href={`/${locale}/login`}
-                  className="mt-4 rounded-full bg-pink-600 px-4 py-2 text-white text-center"
-                >
-                  Login
-                </Link>
-              )}
-
-              {!loading && user && (
-                <button
-                  onClick={handleLogout}
-                  className="mt-4 rounded-full bg-red-500 px-4 py-2 text-white text-left"
-                >
-                  Logout
-                </button>
+                  {/* ✅ Logout (mobile) */}
+                  <button
+                    onClick={handleLogout}
+                    className="mt-4 rounded-full bg-red-500 px-4 py-2 text-white text-left"
+                  >
+                    Logout
+                  </button>
+                </>
               )}
             </div>
           </motion.aside>
