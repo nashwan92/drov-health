@@ -1,102 +1,170 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { useParams } from "next/navigation";
+import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import ProductCard from "@/components/ProductCard";
 
+const COMPANIES = ["RIVA PHARMA", "FUTURE", "El Razy Pharma"];
+
+const CATEGORIES = [
+  "Tablet",
+  "Capsule",
+  "Syrup",
+  "Drops",
+  "Cream",
+  "Gel",
+  "Lotion",
+  "Ampoule",
+];
+
+const gridVariants = {
+  visible: {
+    transition: { staggerChildren: 0.08 },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 260, damping: 22 },
+  },
+};
+
+function ProductSkeleton() {
+  return (
+    <div className="rounded-2xl border bg-white p-4 animate-pulse">
+      <div className="aspect-[4/3] bg-gray-200 rounded-xl" />
+      <div className="mt-4 h-4 bg-gray-200 rounded w-3/4" />
+      <div className="mt-2 h-3 bg-gray-200 rounded w-1/2" />
+      <div className="mt-4 h-3 bg-gray-200 rounded w-2/3" />
+    </div>
+  );
+}
+
 export default function ProductsPage() {
-  const pathname = usePathname();
-  const locale = pathname.split("/")[1] || "en";
+  const params = useParams();
+  const locale = (params.locale as string) || "en";
 
   const [products, setProducts] = useState<any[]>([]);
-  const [companies, setCompanies] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [companyFilter, setCompanyFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
   useEffect(() => {
-    async function load() {
-      const { data: productsData } = await supabase
-        .from("products")
-        .select("*");
-      const { data: companiesData } = await supabase
-        .from("companies")
-        .select("*");
-      const { data: categoriesData } = await supabase
-        .from("categories")
-        .select("*");
+    async function loadProducts() {
+      setLoading(true);
 
-      setProducts(productsData || []);
-      setCompanies(companiesData || []);
-      setCategories(categoriesData || []);
+      const { data } = await supabase
+        .from("products")
+        .select("*")
+        .eq("is_active", true)
+        .order("id", { ascending: false });
+
+      setProducts(data || []);
+      setLoading(false);
     }
 
-    load();
+    loadProducts();
   }, []);
 
-  const filtered = products.filter(
-    (p) =>
-      (companyFilter === "all" || String(p.company_id) === companyFilter) &&
-      (categoryFilter === "all" || String(p.category_id) === categoryFilter)
-  );
+  const filteredProducts = useMemo(() => {
+    return products.filter(
+      (p) =>
+        (companyFilter === "all" || p.company === companyFilter) &&
+        (categoryFilter === "all" || p.category === categoryFilter)
+    );
+  }, [products, companyFilter, categoryFilter]);
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-bold">Products</h1>
+    <div className="space-y-10 px-4 sm:px-6 lg:px-10 xl:px-14">
+      {/* HEADER */}
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-bold">Our Products</h1>
+        <p className="text-gray-500 max-w-xl mx-auto">
+          Discover our pharmaceutical and healthcare portfolio
+        </p>
+      </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-4 bg-white p-3 border rounded-xl text-sm">
+      {/* FILTERS */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-wrap gap-6 rounded-2xl border bg-white px-6 py-4 shadow-sm"
+      >
         <div>
-          <div className="text-xs text-slate-500 mb-1">Company</div>
+          <label className="block text-xs text-gray-500 mb-1">Company</label>
           <select
-            className="border rounded px-2 py-1"
+            className="rounded-lg border px-3 py-2 text-sm"
             value={companyFilter}
             onChange={(e) => setCompanyFilter(e.target.value)}
           >
             <option value="all">All companies</option>
-            {companies.map((c) => (
-              <option key={c.id} value={String(c.id)}>
-                {c.name}
-              </option>
+            {COMPANIES.map((c) => (
+              <option key={c}>{c}</option>
             ))}
           </select>
         </div>
 
         <div>
-          <div className="text-xs text-slate-500 mb-1">Category</div>
+          <label className="block text-xs text-gray-500 mb-1">Category</label>
           <select
-            className="border rounded px-2 py-1"
+            className="rounded-lg border px-3 py-2 text-sm"
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
           >
             <option value="all">All categories</option>
-            {categories.map((c) => (
-              <option key={c.id} value={String(c.id)}>
-                {c.name}
-              </option>
+            {CATEGORIES.map((c) => (
+              <option key={c}>{c}</option>
             ))}
           </select>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Products grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {filtered.map((p) => {
-          const company = companies.find((c) => c.id === p.company_id);
-          const category = categories.find((c) => c.id === p.category_id);
+      {/* GRID */}
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ProductSkeleton key={i} />
+          ))}
+        </div>
+      ) : (
+        <motion.div
+          layout
+          variants={gridVariants}
+          initial="visible"
+          animate="visible"
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+        >
+          {filteredProducts.map((product) => (
+            <motion.div
+              key={product.id}
+              layout
+              variants={cardVariants}
+              initial="hidden"
+              animate="visible"
+              whileHover={{ y: -6 }}
+            >
+              <ProductCard
+                product={product}
+                locale={locale}
+                companyName={product.company}
+                categoryName={product.category}
+              />
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
 
-          return (
-            <ProductCard
-              key={p.id}
-              product={p}
-              locale={locale}
-              companyName={company?.name}
-              categoryName={category?.name}
-            />
-          );
-        })}
-      </div>
+      {!loading && filteredProducts.length === 0 && (
+        <p className="text-center text-sm text-gray-500">
+          No products found.
+        </p>
+      )}
     </div>
   );
 }

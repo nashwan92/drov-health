@@ -8,9 +8,43 @@ import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/lib/useAuth";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { t } from "@/lib/translations";
-
 import Image from "next/image";
 
+/* ✅ Desktop Nav Link (ADDED – desktop only) */
+const DesktopNavLink = ({
+  href,
+  active,
+  children,
+}: {
+  href: string;
+  active: boolean;
+  children: React.ReactNode;
+}) => {
+  return (
+    <Link
+      href={href}
+      className={`relative px-3 py-2 rounded-xl transition-all
+        ${active ? "bg-pink-50 text-pink-600 font-semibold" : "text-gray-700"}
+        hover:bg-pink-50 hover:text-pink-600`}
+    >
+      <span className="relative">
+        {children}
+
+        {/* underline base */}
+        <span className="absolute left-0 right-0 -bottom-1 h-[2px] bg-pink-200/50 rounded-full" />
+
+        {/* animated underline */}
+        {active && (
+          <motion.span
+            layoutId="desktop-nav-underline"
+            className="absolute left-0 right-0 -bottom-1 h-[2px] bg-pink-600 rounded-full"
+            transition={{ type: "spring", stiffness: 500, damping: 32 }}
+          />
+        )}
+      </span>
+    </Link>
+  );
+};
 
 export default function Navbar({ locale }: { locale: string }) {
   const pathname = usePathname();
@@ -65,60 +99,74 @@ export default function Navbar({ locale }: { locale: string }) {
     window.location.href = `/${locale}`;
   };
 
-  const linkClass = (href: string) =>
-    pathname === href
-      ? "text-pink-600 font-semibold"
-      : "hover:text-pink-500 transition";
-
   return (
     <>
       {/* ===== NAVBAR ===== */}
       <header className="bg-white border-b sticky top-0 z-50">
         <nav className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           
-          
+          {/* LOGO */}
+          <Link
+            href={`/${locale}`}
+            className="flex items-center"
+            aria-label="DROV Home"
+          >
+            <Image
+              src="/logo/d-logo.png"
+              alt="DROV Logo"
+              width={140}
+              height={40}
+              priority
+              className="h-15 w-auto object-contain"
+            />
+          </Link>
 
-
-<Link
-  href={`/${locale}`}
-  className="flex items-center"
-  aria-label="DROV Home"
->
-  <Image
-    src="/logo/d-logo.png"
-    alt="DROV Logo"
-    width={140}
-    height={40}
-    priority
-    className="h-10 w-auto object-contain"
-  />
-</Link>
-
-          {/* Desktop menu */}
-          <ul className="hidden md:flex gap-8 text-lg font-medium items-center">
-            <Link href={`/${locale}`} className={linkClass(`/${locale}`)}>
+          {/* ===== DESKTOP MENU (ENHANCED) ===== */}
+          <ul className="hidden md:flex gap-2 text-lg font-medium items-center">
+            <DesktopNavLink
+              href={`/${locale}`}
+              active={pathname === `/${locale}`}
+            >
               {t(locale, "navHome")}
-            </Link>
-            <Link href={`/${locale}/about`} className={linkClass(`/${locale}/about`)}>
+            </DesktopNavLink>
+
+            <DesktopNavLink
+              href={`/${locale}/about`}
+              active={pathname === `/${locale}/about`}
+            >
               {t(locale, "navAbout") ?? "About"}
-            </Link>
-            <Link href={`/${locale}/products`} className={linkClass(`/${locale}/products`)}>
+            </DesktopNavLink>
+
+            <DesktopNavLink
+              href={`/${locale}/products`}
+              active={pathname.startsWith(`/${locale}/products`)}
+            >
               {t(locale, "navProducts")}
-            </Link>
-            <Link href={`/${locale}/news`} className={linkClass(`/${locale}/news`)}>
+            </DesktopNavLink>
+
+            <DesktopNavLink
+              href={`/${locale}/news`}
+              active={pathname === `/${locale}/news`}
+            >
               {t(locale, "navNews")}
-            </Link>
-            <Link href={`/${locale}/jobs`} className={linkClass(`/${locale}/jobs`)}>
+            </DesktopNavLink>
+
+            <DesktopNavLink
+              href={`/${locale}/jobs`}
+              active={pathname === `/${locale}/jobs`}
+            >
               {t(locale, "navJobs")}
-            </Link>
+            </DesktopNavLink>
 
             {!loading && user && (
               <>
-                <Link href={`/${locale}/dashboard`} className="text-blue-600 font-semibold">
+                <DesktopNavLink
+                  href={`/${locale}/dashboard`}
+                  active={pathname.startsWith(`/${locale}/dashboard`)}
+                >
                   Dashboard
-                </Link>
+                </DesktopNavLink>
 
-                {/* ✅ Logout (desktop) */}
                 <button
                   onClick={handleLogout}
                   className="ml-4 rounded-full border px-4 py-1 text-sm hover:bg-slate-100 transition"
@@ -157,7 +205,7 @@ export default function Navbar({ locale }: { locale: string }) {
         )}
       </AnimatePresence>
 
-      {/* ===== MOBILE MENU ===== */}
+      {/* ===== MOBILE MENU (UNCHANGED) ===== */}
       <AnimatePresence>
         {open && (
           <motion.aside
@@ -205,7 +253,6 @@ export default function Navbar({ locale }: { locale: string }) {
                     Dashboard
                   </Link>
 
-                  {/* ✅ Logout (mobile) */}
                   <button
                     onClick={handleLogout}
                     className="mt-4 rounded-full bg-red-500 px-4 py-2 text-white text-left"
