@@ -26,13 +26,24 @@ const gridVariants = {
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: {
+    opacity: 0,
+    y: 20,
+    transition: {
+      stiffness: 260,
+      damping: 24,
+    },
+  },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { type: "spring", stiffness: 260, damping: 22 },
+    transition: {
+      stiffness: 260,
+      damping: 24,
+    },
   },
 };
+
 
 function ProductSkeleton() {
   return (
