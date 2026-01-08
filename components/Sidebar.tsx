@@ -14,6 +14,7 @@ export default function Sidebar({ locale }: { locale: string }) {
     { label: "Users", href: `/${locale}/dashboard/users` },
     { label: "News", href: `/${locale}/dashboard/news` },
     { label: "Jobs", href: `/${locale}/dashboard/jobs` },
+    { label: "Inbox", href: `/${locale}/dashboard/inbox` },
 
   ];
 

@@ -1,8 +1,12 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import PartnersSlider from "@/components/about/PartnersSlider";
 import NewsSlider from "@/components/home/NewsSlider";
 import HomeProductsPreview from "@/components/home/HomeProductsPreview";
+
+import { t } from "@/lib/translations";
+
 
 export default async function HomePage({
   params,
@@ -193,11 +197,8 @@ export default async function HomePage({
         </div>
       </section>
 
-     {/* ================= LATEST NEWS ================= */}
-<section
-  id="news"
-  className="relative py-24 overflow-hidden"
->
+    {/* ================= LATEST NEWS ================= */}
+<section id="news" className="relative py-24 overflow-hidden">
   {/* Background */}
   <div className="absolute inset-0 bg-gradient-to-b from-[#F1F8F4] via-white to-[#E8F5E9]" />
 
@@ -225,30 +226,9 @@ export default async function HomePage({
       </Link>
     </div>
 
-    {/* News slider */}
+    {/* News slider (REAL DATA) */}
     <div className="relative rounded-3xl bg-white/80 backdrop-blur border shadow-sm p-6">
-      <NewsSlider
-        news={[
-          {
-            title: "DROV Expands Distribution Network",
-            summary:
-              "We are proud to announce the expansion of our distribution coverage across Iraq.",
-            link: `/${locale}/news/drov-expands-network`,
-          },
-          {
-            title: "New International Partnership",
-            summary:
-              "DROV signs strategic partnership with leading pharmaceutical brand.",
-            link: `/${locale}/news/new-partnership`,
-          },
-          {
-            title: "Introducing New Medical Products",
-            summary:
-              "A new range of certified medical supplies is now available.",
-            link: `/${locale}/news/new-products`,
-          },
-        ]}
-      />
+      <NewsSlider locale={locale} />
     </div>
 
     {/* Mobile button */}
@@ -262,6 +242,7 @@ export default async function HomePage({
     </div>
   </div>
 </section>
+
 
 
       {/* ================= CTA ================= */}
