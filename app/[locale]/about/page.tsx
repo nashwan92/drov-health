@@ -17,7 +17,7 @@ export default function AboutPage() {
   ]
 
   // Update coordinates to your real office location
-  const mapEmbedUrl = 'https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3219.8394411272716!2d43.99851177581087!3d36.19478647242599!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMzbCsDExJzQxLjIiTiA0NMKwMDAnMDMuOSJF!5e0!3m2!1sen!2siq!4v1766001866882!5m2!1sen!2siq'
+  const mapEmbedUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3219.8372164263046!2d43.99901807429978!3d36.194840572425946!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4007230014e0537b%3A0xd4d5a61833207dbf!2sDROV%20Company!5e0!3m2!1sen!2siq!4v1768024630953!5m2!1sen!2siq" width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade'
 
   return (
     <main className="about-page bg-slate-50">

@@ -74,90 +74,125 @@ export default function AddProductPage() {
   }
 
   return (
-    <div className="p-6 max-w-2xl">
-      <h1 className="text-2xl font-semibold mb-6">Add Product</h1>
+    <div className="mx-auto max-w-2xl px-4 sm:px-6 py-6 sm:py-8 space-y-5">
+      <h1 className="text-xl sm:text-2xl font-semibold text-slate-900">
+        Add Product
+      </h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white border rounded-2xl p-4 sm:p-6 space-y-4"
+      >
+        {/* Names */}
         <input
           placeholder="Product name (EN)"
           value={nameEn}
           onChange={(e) => setNameEn(e.target.value)}
           required
-          className="w-full border rounded-lg p-2"
+          className="w-full border rounded-lg p-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500"
         />
 
         <input
           placeholder="Product name (AR)"
           value={nameAr}
           onChange={(e) => setNameAr(e.target.value)}
-          className="w-full border rounded-lg p-2"
+          className="w-full border rounded-lg p-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500"
         />
 
         <input
           placeholder="Product name (KU)"
           value={nameKu}
           onChange={(e) => setNameKu(e.target.value)}
-          className="w-full border rounded-lg p-2"
+          className="w-full border rounded-lg p-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500"
         />
 
+        {/* Description */}
         <textarea
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full border rounded-lg p-2 min-h-[100px]"
+          className="w-full border rounded-lg p-3 min-h-[120px] text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500"
         />
 
-       <div>
-  <label className="block text-sm font-medium mb-1">Company</label>
-  <select
-    value={company}
-    onChange={(e) => setCompany(e.target.value)}
-    className="w-full border rounded-lg p-2 bg-white"
-    required
-  >
-    <option value="">Select company</option>
-    <option value="RIVA PHARMA">RIVA PHARMA</option>
-    <option value="FUTURE">FUTURE</option>
-    <option value="El Razy Pharma">El Razy Pharma</option>
-  </select>
-</div>
+        {/* Company */}
+        <div>
+          <label className="block text-xs sm:text-sm font-medium mb-1">
+            Company
+          </label>
+          <select
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            required
+            className="w-full border rounded-lg p-3 bg-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          >
+            <option value="">Select company</option>
+            <option value="RIVA PHARMA">RIVA PHARMA</option>
+            <option value="FUTURE">FUTURE</option>
+            <option value="El Razy Pharma">El Razy Pharma</option>
+          </select>
+        </div>
 
+        {/* Category */}
+        <div>
+          <label className="block text-xs sm:text-sm font-medium mb-1">
+            Category
+          </label>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+            className="w-full border rounded-lg p-3 bg-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          >
+            <option value="">Select category</option>
+            <option value="Tablet">Tablet</option>
+            <option value="Capsule">Capsule</option>
+            <option value="Syrup">Syrup</option>
+            <option value="Drops">Drops</option>
+            <option value="Cream">Cream</option>
+            <option value="Gel">Gel</option>
+            <option value="Lotion">Lotion</option>
+            <option value="Ampoule">Ampoule</option>
+          </select>
+        </div>
 
-       <div>
-  <label className="block text-sm font-medium mb-1">Category</label>
-  <select
-    value={category}
-    onChange={(e) => setCategory(e.target.value)}
-    className="w-full border rounded-lg p-2 bg-white"
-    required
-  >
-    <option value="">Select category</option>
-    <option value="Tablet">Tablet</option>
-    <option value="Capsule">Capsule</option>
-    <option value="Syrup">Syrup</option>
-    <option value="Drops">Drops</option>
-    <option value="Cream">Cream</option>
-    <option value="Gel">Gel</option>
-    <option value="Lotion">Lotion</option>
-    <option value="Ampoule">Ampoule</option>
-  </select>
-</div>
+        {/* Upload image */}
+        <div className="space-y-1">
+          <label className="block text-xs sm:text-sm font-medium">
+            Product Image
+          </label>
 
+          <label className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-4 py-3 sm:py-2 rounded-lg border cursor-pointer hover:bg-slate-50 transition text-sm text-slate-700">
+            📤 Upload Image
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={(e) =>
+                setImageFile(e.target.files?.[0] || null)
+              }
+            />
+          </label>
 
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-        />
+          {imageFile && (
+            <p className="text-xs text-slate-500 truncate">
+              Selected: {imageFile.name}
+            </p>
+          )}
+        </div>
 
+        {/* Submit */}
         <button
           disabled={loading}
-          className="bg-black text-white px-6 py-2 rounded-lg"
+          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl transition text-sm sm:text-base cursor-pointer"
         >
           {loading ? "Saving..." : "Add Product"}
         </button>
 
-        {message && <p className="mt-2">{message}</p>}
+        {message && (
+          <p className="text-sm text-center text-slate-700">
+            {message}
+          </p>
+        )}
       </form>
     </div>
   );
