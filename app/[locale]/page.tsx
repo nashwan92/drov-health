@@ -19,6 +19,8 @@ export default async function HomePage({
     { src: "/partners/elrazy.png", alt: "Elrazy" },
     { src: "/partners/future.png", alt: "Future" },
     { src: "/partners/riva.png", alt: "Riva" },
+        { src: '/partners/scott-edil.png', alt: 'scott-edil' },
+
   ];
 
   return (
@@ -70,13 +72,15 @@ export default async function HomePage({
         </div>
       </section>
 
+
+
       {/* ================= TRUST / STATS ================= */}
       <section className="py-16 bg-white border-t border-b">
         <div className="mx-auto max-w-6xl px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
-            ["10+", "Years Experience"],
-            ["500+", "Products"],
-            ["100+", "Partners"],
+            ["15+", "Years Experience"],
+            ["200+", "Products"],
+            ["10+", "Partners"],
             ["All Iraq", "Nationwide Coverage"],
           ].map(([value, label]) => (
             <div key={label}>
@@ -86,6 +90,24 @@ export default async function HomePage({
           ))}
         </div>
       </section>
+
+      {/* ================= ================= */}
+
+      {/* ================= PARTNERS ================= */}
+      <section className="py-20">
+        <div className="mx-auto max-w-6xl px-4">
+          <h2 className="text-3xl font-semibold text-center">
+            Trusted by Leading Brands
+          </h2>
+
+          <div className="mt-10">
+            <PartnersSlider partners={partners} />
+          </div>
+        </div>
+      </section>
+
+
+
 
       {/* ================= PRODUCTS PREVIEW ================= */}
       <section id="products" className="py-20">
@@ -183,19 +205,6 @@ export default async function HomePage({
   </div>
 </section>
 
-
-      {/* ================= PARTNERS ================= */}
-      <section className="py-20">
-        <div className="mx-auto max-w-6xl px-4">
-          <h2 className="text-3xl font-semibold text-center">
-            Trusted by Leading Brands
-          </h2>
-
-          <div className="mt-10">
-            <PartnersSlider partners={partners} />
-          </div>
-        </div>
-      </section>
 
     {/* ================= LATEST NEWS ================= */}
 <section id="news" className="relative py-24 overflow-hidden">

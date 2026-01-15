@@ -14,6 +14,7 @@ export default function AboutPage() {
     { src: '/partners/elrazy.png', alt: 'el-razy' },
     { src: '/partners/future.png', alt: 'future' },
     { src: '/partners/riva.png', alt: 'riva' },
+    { src: '/partners/scott-edil.png', alt: 'scott-edil' },
   ]
 
   // Update coordinates to your real office location

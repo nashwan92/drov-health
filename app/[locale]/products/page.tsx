@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import ProductCard from "@/components/ProductCard";
 
-const COMPANIES = ["RIVA PHARMA", "FUTURE", "El Razy Pharma"];
+const COMPANIES = ["RIVA PHARMA", "FUTURE", "El Razy Pharma", "SCOTT-EDIL"];
 
 const CATEGORIES = [
   "Tablet",
