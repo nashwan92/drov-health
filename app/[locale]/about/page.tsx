@@ -40,8 +40,11 @@ export default function AboutPage() {
       </div>
 
       <div className="leading-tight">
-        <div className="text-sm font-medium text-emerald-700">Drov</div>
-        <div className="text-xs text-emerald-600">Health & Beauty</div>
+        <div className="text-lg font-semibold tracking-wide text-emerald-600">Drov</div>
+<div className="text-lg sm:text-xl font-semibold tracking-wide text-emerald-600">
+  Health & Beauty
+</div>
+
       </div>
     </div>
 

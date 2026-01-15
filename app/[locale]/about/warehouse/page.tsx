@@ -65,7 +65,7 @@ export default function WarehousePage() {
             <div className="absolute inset-0 rounded-3xl bg-white/40 backdrop-blur border shadow-sm" />
             <div className="relative overflow-hidden rounded-3xl">
               <Image
-                src="/warehouse/warehouse.jpg" // ✅ your image
+                src="/warehouse/warehouse.jpeg" // ✅ your image
                 alt="DROV Warehouse"
                 width={900}
                 height={600}

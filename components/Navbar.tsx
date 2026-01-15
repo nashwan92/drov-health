@@ -10,7 +10,15 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import { t } from "@/lib/translations";
 import Image from "next/image";
 
-/* ✅ Desktop Nav Link (ADDED – desktop only) */
+/* ================= ABOUT MENU DATA ================= */
+const aboutMenu = [
+  { title: "About Drov", href: "/about", desc: "Company overview & mission" },
+  { title: "Directors", href: "/about/directors", desc: "Board & leadership" },
+  { title: "Our Team", href: "/about/team", desc: "Professional staff" },
+  { title: "Warehouse", href: "/about/warehouse", desc: "Storage & logistics" },
+];
+
+/* ================= DESKTOP NAV LINK ================= */
 const DesktopNavLink = ({
   href,
   active,
@@ -19,80 +27,69 @@ const DesktopNavLink = ({
   href: string;
   active: boolean;
   children: React.ReactNode;
-}) => {
+}) => (
+  <Link
+    href={href}
+    className={`relative px-3 py-2 rounded-xl transition
+      ${active ? "bg-pink-50 text-pink-600 font-semibold" : "text-gray-700"}
+      hover:bg-pink-50 hover:text-pink-600`}
+  >
+    {children}
+  </Link>
+);
+
+/* ================= ABOUT MEGA MENU (DESKTOP) ================= */
+const AboutMegaMenu = ({ locale }: { locale: string }) => {
+  const pathname = usePathname();
+
   return (
-    <Link
-      href={href}
-      className={`relative px-3 py-2 rounded-xl transition-all
-        ${active ? "bg-pink-50 text-pink-600 font-semibold" : "text-gray-700"}
-        hover:bg-pink-50 hover:text-pink-600`}
-    >
-      <span className="relative">
-        {children}
-
-        {/* underline base */}
-        <span className="absolute left-0 right-0 -bottom-1 h-[2px] bg-pink-200/50 rounded-full" />
-
-        {/* animated underline */}
-        {active && (
-          <motion.span
-            layoutId="desktop-nav-underline"
-            className="absolute left-0 right-0 -bottom-1 h-[2px] bg-pink-600 rounded-full"
-            transition={{ type: "spring", stiffness: 500, damping: 32 }}
-          />
-        )}
+    <div className="relative group">
+      <span className="cursor-pointer px-3 py-2 rounded-xl text-gray-700 hover:bg-pink-50 hover:text-pink-600">
+        About ▾
       </span>
-    </Link>
+
+      <div className="absolute left-0 top-full z-50 hidden group-hover:block">
+        <div className="mt-4 w-[520px] rounded-2xl border bg-white shadow-xl p-6">
+          <div className="grid grid-cols-2 gap-4">
+            {aboutMenu.map((item) => {
+              const active = pathname === `/${locale}${item.href}`;
+              return (
+                <Link
+                  key={item.href}
+                  href={`/${locale}${item.href}`}
+                  className={`rounded-xl p-4 transition ${
+                    active
+                      ? "bg-pink-50 text-pink-600"
+                      : "hover:bg-slate-50"
+                  }`}
+                >
+                  <div className="font-semibold">{item.title}</div>
+                  <p className="mt-1 text-sm text-slate-600">{item.desc}</p>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
+/* ================= NAVBAR ================= */
 export default function Navbar({ locale }: { locale: string }) {
   const pathname = usePathname();
   const { user, loading } = useAuth();
+
   const [open, setOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const isRTL = locale === "ar" || locale === "ku";
 
-  /* Close on route change */
   useEffect(() => {
     setOpen(false);
+    setAboutOpen(false);
   }, [pathname]);
-
-  /* ESC to close */
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, []);
-
-  /* Focus trap */
-  useEffect(() => {
-    if (!open || !menuRef.current) return;
-
-    const focusable = menuRef.current.querySelectorAll<HTMLElement>("a, button");
-    focusable[0]?.focus();
-
-    const trap = (e: KeyboardEvent) => {
-      if (e.key !== "Tab") return;
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener("keydown", trap);
-    return () => document.removeEventListener("keydown", trap);
-  }, [open]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -101,41 +98,20 @@ export default function Navbar({ locale }: { locale: string }) {
 
   return (
     <>
-      {/* ===== NAVBAR ===== */}
+      {/* ================= HEADER ================= */}
       <header className="bg-white border-b sticky top-0 z-50">
         <nav className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          
-          {/* LOGO */}
-          <Link
-            href={`/${locale}`}
-            className="flex items-center"
-            aria-label="DROV Home"
-          >
-            <Image
-              src="/logo/d-logo.png"
-              alt="DROV Logo"
-              width={140}
-              height={40}
-              priority
-              className="h-15 w-auto object-contain"
-            />
+          <Link href={`/${locale}`} aria-label="Home">
+            <Image src="/logo/d-logo.png" alt="DROV" width={140} height={40} priority />
           </Link>
 
-          {/* ===== DESKTOP MENU (ENHANCED) ===== */}
-          <ul className="hidden md:flex gap-2 text-lg font-medium items-center">
-            <DesktopNavLink
-              href={`/${locale}`}
-              active={pathname === `/${locale}`}
-            >
+          {/* ========== DESKTOP MENU ========== */}
+          <ul className="hidden md:flex items-center gap-2 text-lg font-medium">
+            <DesktopNavLink href={`/${locale}`} active={pathname === `/${locale}`}>
               {t(locale, "navHome")}
             </DesktopNavLink>
 
-            <DesktopNavLink
-              href={`/${locale}/about`}
-              active={pathname === `/${locale}/about`}
-            >
-              {t(locale, "navAbout") ?? "About"}
-            </DesktopNavLink>
+            <AboutMegaMenu locale={locale} />
 
             <DesktopNavLink
               href={`/${locale}/products`}
@@ -144,17 +120,11 @@ export default function Navbar({ locale }: { locale: string }) {
               {t(locale, "navProducts")}
             </DesktopNavLink>
 
-            <DesktopNavLink
-              href={`/${locale}/news`}
-              active={pathname === `/${locale}/news`}
-            >
+            <DesktopNavLink href={`/${locale}/news`} active={pathname === `/${locale}/news`}>
               {t(locale, "navNews")}
             </DesktopNavLink>
 
-            <DesktopNavLink
-              href={`/${locale}/jobs`}
-              active={pathname === `/${locale}/jobs`}
-            >
+            <DesktopNavLink href={`/${locale}/jobs`} active={pathname === `/${locale}/jobs`}>
               {t(locale, "navJobs")}
             </DesktopNavLink>
 
@@ -169,7 +139,7 @@ export default function Navbar({ locale }: { locale: string }) {
 
                 <button
                   onClick={handleLogout}
-                  className="ml-4 rounded-full border px-4 py-1 text-sm hover:bg-slate-100 transition"
+                  className="ml-3 rounded-full border px-4 py-1 text-sm hover:bg-slate-100"
                 >
                   Logout
                 </button>
@@ -179,87 +149,110 @@ export default function Navbar({ locale }: { locale: string }) {
 
           <div className="flex items-center gap-4">
             <LanguageSwitcher currentLocale={locale} />
-
-            <button
-              onClick={() => setOpen(true)}
-              className="md:hidden text-2xl"
-              aria-label="Open menu"
-              aria-expanded={open}
-            >
+            <button onClick={() => setOpen(true)} className="md:hidden text-2xl">
               ☰
             </button>
           </div>
         </nav>
       </header>
 
-      {/* ===== OVERLAY ===== */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            className="fixed inset-0 bg-black/40 z-40"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* ===== MOBILE MENU (UNCHANGED) ===== */}
+      {/* ================= MOBILE MENU (FIXED & POLISHED) ================= */}
       <AnimatePresence>
         {open && (
           <motion.aside
             ref={menuRef}
-            role="dialog"
-            aria-modal="true"
-            initial={{ x: isRTL ? -300 : 300 }}
+            initial={{ x: isRTL ? -320 : 320 }}
             animate={{ x: 0 }}
-            exit={{ x: isRTL ? -300 : 300 }}
-            transition={{ type: "spring", stiffness: 260, damping: 24 }}
-            className={`fixed top-0 ${isRTL ? "left-0" : "right-0"} z-50 h-full w-72 bg-white shadow-xl`}
+            exit={{ x: isRTL ? -320 : 320 }}
+            transition={{ type: "spring", stiffness: 260, damping: 26 }}
+            className={`fixed top-0 ${isRTL ? "left-0" : "right-0"} z-50 h-full w-80 bg-white shadow-xl`}
           >
-            <div className="p-6 flex flex-col gap-5 text-lg font-medium">
-              <button
-                onClick={() => setOpen(false)}
-                className="self-end text-2xl"
-                aria-label="Close menu"
-              >
-                ✕
-              </button>
+            <div className="p-6 flex flex-col gap-6">
 
-              {[
-                ["", "navHome"],
-                ["/about", "navAbout"],
-                ["/products", "navProducts"],
-                ["/news", "navNews"],
-                ["/jobs", "navJobs"],
-              ].map(([path, key]) => (
+              {/* Close */}
+              <div className="flex justify-end">
+                <button onClick={() => setOpen(false)} className="text-2xl">✕</button>
+              </div>
+
+              {/* MAIN LINKS */}
+              <nav className="flex flex-col gap-3 text-lg font-medium">
+
                 <Link
-                  key={key}
-                  href={`/${locale}${path}`}
-                  className={
-                    pathname === `/${locale}${path}`
-                      ? "text-pink-600 font-semibold"
-                      : ""
-                  }
+                  href={`/${locale}`}
+                  className="rounded-xl px-4 py-3 hover:bg-pink-50 transition"
                 >
-                  {t(locale, key) ?? key}
+                  {t(locale, "navHome")}
                 </Link>
-              ))}
 
+                {/* ABOUT (Accordion) */}
+                <button
+                  onClick={() => setAboutOpen(!aboutOpen)}
+                  className="flex justify-between items-center rounded-xl px-4 py-3 hover:bg-pink-50 transition"
+                >
+                  <span>About</span>
+                  <span className="text-xl">{aboutOpen ? "−" : "+"}</span>
+                </button>
+
+                <AnimatePresence>
+                  {aboutOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="ml-3 border-l pl-3 flex flex-col gap-2"
+                    >
+                      {aboutMenu.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={`/${locale}${item.href}`}
+                          className="rounded-lg px-3 py-2 text-base hover:bg-pink-50 transition"
+                        >
+                          {item.title}
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <Link
+                  href={`/${locale}/products`}
+                  className="rounded-xl px-4 py-3 hover:bg-pink-50 transition"
+                >
+                  {t(locale, "navProducts")}
+                </Link>
+
+                <Link
+                  href={`/${locale}/news`}
+                  className="rounded-xl px-4 py-3 hover:bg-pink-50 transition"
+                >
+                  {t(locale, "navNews")}
+                </Link>
+
+                <Link
+                  href={`/${locale}/jobs`}
+                  className="rounded-xl px-4 py-3 hover:bg-pink-50 transition"
+                >
+                  {t(locale, "navJobs")}
+                </Link>
+              </nav>
+
+              {/* AUTH */}
               {!loading && user && (
-                <>
-                  <Link href={`/${locale}/dashboard`} className="text-blue-600 font-semibold">
+                <div className="pt-4 border-t flex flex-col gap-3">
+                  <Link
+                    href={`/${locale}/dashboard`}
+                    className="rounded-xl px-4 py-3 bg-emerald-50 text-emerald-700"
+                  >
                     Dashboard
                   </Link>
 
                   <button
                     onClick={handleLogout}
-                    className="mt-4 rounded-full bg-red-500 px-4 py-2 text-white text-left"
+                    className="rounded-xl px-4 py-3 bg-red-50 text-red-600 text-left"
                   >
                     Logout
                   </button>
-                </>
+                </div>
               )}
             </div>
           </motion.aside>
