@@ -129,6 +129,7 @@ export default function AddProductPage() {
             <option value="RIVA PHARMA">RIVA PHARMA</option>
             <option value="FUTURE">FUTURE</option>
             <option value="El Razy Pharma">El Razy Pharma</option>
+            <option value="SCOTT-EDIL">SCOTT-EDIL</option>
           </select>
         </div>
 
