@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function AddProductPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  const [partners, setPartners] = useState<any[]>([]);
 
   const [nameEn, setNameEn] = useState("");
   const [nameAr, setNameAr] = useState("");
@@ -14,6 +16,20 @@ export default function AddProductPage() {
   const [company, setCompany] = useState("");
   const [category, setCategory] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    async function loadPartners() {
+      const { data } = await supabase
+        .from("partners")
+        .select("id, name")
+        .eq("is_active", true)
+        .order("name", { ascending: true });
+
+      setPartners(data || []);
+    }
+
+    loadPartners();
+  }, []);
 
   async function uploadImage(file: File) {
     const ext = file.name.split(".").pop();
@@ -79,11 +95,7 @@ export default function AddProductPage() {
         Add Product
       </h1>
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white border rounded-2xl p-4 sm:p-6 space-y-4"
-      >
-        {/* Names */}
+      <form onSubmit={handleSubmit} className="bg-white border rounded-2xl p-4 sm:p-6 space-y-4">
         <input
           placeholder="Product name (EN)"
           value={nameEn}
@@ -106,7 +118,6 @@ export default function AddProductPage() {
           className="w-full border rounded-lg p-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500"
         />
 
-        {/* Description */}
         <textarea
           placeholder="Description"
           value={description}
@@ -114,7 +125,6 @@ export default function AddProductPage() {
           className="w-full border rounded-lg p-3 min-h-[120px] text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500"
         />
 
-        {/* Company */}
         <div>
           <label className="block text-xs sm:text-sm font-medium mb-1">
             Company
@@ -126,14 +136,15 @@ export default function AddProductPage() {
             className="w-full border rounded-lg p-3 bg-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
             <option value="">Select company</option>
-            <option value="RIVA PHARMA">RIVA PHARMA</option>
-            <option value="FUTURE">FUTURE</option>
-            <option value="El Razy Pharma">El Razy Pharma</option>
-            <option value="SCOTT-EDIL">SCOTT-EDIL</option>
+
+            {partners.map((partner) => (
+              <option key={partner.id} value={partner.name}>
+                {partner.name}
+              </option>
+            ))}
           </select>
         </div>
 
-        {/* Category */}
         <div>
           <label className="block text-xs sm:text-sm font-medium mb-1">
             Category
@@ -156,7 +167,6 @@ export default function AddProductPage() {
           </select>
         </div>
 
-        {/* Upload image */}
         <div className="space-y-1">
           <label className="block text-xs sm:text-sm font-medium">
             Product Image
@@ -168,9 +178,7 @@ export default function AddProductPage() {
               type="file"
               accept="image/*"
               hidden
-              onChange={(e) =>
-                setImageFile(e.target.files?.[0] || null)
-              }
+              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
             />
           </label>
 
@@ -181,7 +189,6 @@ export default function AddProductPage() {
           )}
         </div>
 
-        {/* Submit */}
         <button
           disabled={loading}
           className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl transition text-sm sm:text-base cursor-pointer"

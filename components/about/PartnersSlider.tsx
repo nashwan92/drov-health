@@ -1,9 +1,15 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
-type Partner = { src: string; alt: string }
+type Partner = {
+  src: string
+  alt: string
+  slug?: string
+}
 
 export default function PartnersSlider({
   partners,
@@ -13,8 +19,14 @@ export default function PartnersSlider({
   intervalMs?: number
 }) {
   const [index, setIndex] = useState(0)
+  const params = useParams()
+  const locale = typeof params?.locale === 'string' ? params.locale : 'en'
 
-  const safePartners = useMemo(() => partners.filter(Boolean), [partners])
+  const safePartners = useMemo(
+    () => partners.filter((p) => p && p.src),
+    [partners]
+  )
+
   const total = safePartners.length
 
   useEffect(() => {
@@ -28,10 +40,11 @@ export default function PartnersSlider({
 
   if (!total) return null
 
+  const getHref = (p: Partner) =>
+    p.slug ? `/${locale}/products?company=${p.slug}` : `/${locale}/products`
+
   return (
     <section className="rounded-2xl border border-slate-200 bg-white px-10 py-14">
-
-      {/* Title */}
       <div className="text-center">
         <h2 className="text-2xl font-semibold text-slate-900">
           Our Partners
@@ -41,19 +54,19 @@ export default function PartnersSlider({
         </p>
       </div>
 
-      {/* Strong divider */}
       <div className="mx-auto mt-8 h-[2px] w-32 bg-emerald-600" />
 
-      {/* Featured logo */}
       <div className="relative mt-12 flex h-36 items-center justify-center">
         {safePartners.map((p, i) => (
-          <div
+          <Link
             key={p.src + i}
+            href={getHref(p)}
             className={`absolute transition-all duration-700 ${
               i === index
                 ? 'opacity-100 scale-100'
                 : 'opacity-0 scale-95 pointer-events-none'
             }`}
+            aria-label={`View ${p.alt} products`}
           >
             <Image
               src={p.src}
@@ -63,11 +76,10 @@ export default function PartnersSlider({
               className="max-h-28 w-auto object-contain grayscale hover:grayscale-0 transition"
               priority={i === 0}
             />
-          </div>
+          </Link>
         ))}
       </div>
 
-      {/* Navigation */}
       <div className="mt-6 flex justify-center gap-3">
         {safePartners.map((_, i) => (
           <button
@@ -83,22 +95,26 @@ export default function PartnersSlider({
         ))}
       </div>
 
-      {/* Logo strip */}
       <div className="mt-14 flex flex-wrap items-center justify-center gap-x-20 gap-y-10">
         {safePartners.map((p, i) => (
-          <Image
+          <Link
             key={p.src + i}
-            src={p.src}
-            alt={p.alt}
-            width={200}
-            height={80}
-            className={`h-16 w-auto object-contain transition-opacity ${
+            href={getHref(p)}
+            className={`transition-opacity ${
               i === index ? 'opacity-40' : 'opacity-100'
             }`}
-          />
+            aria-label={`View ${p.alt} products`}
+          >
+            <Image
+              src={p.src}
+              alt={p.alt}
+              width={200}
+              height={80}
+              className="h-16 w-auto object-contain"
+            />
+          </Link>
         ))}
       </div>
-
     </section>
   )
 }

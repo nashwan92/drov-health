@@ -10,6 +10,8 @@ export default function Sidebar({ locale }: { locale: string }) {
     { label: "Dashboard", href: `/${locale}/dashboard` },
     { label: "Products", href: `/${locale}/dashboard/products` },
     { label: "Add Product", href: `/${locale}/dashboard/products/add` },
+      { label: "Partners", href: `/${locale}/dashboard/partners` },
+
     { label: "Orders", href: `/${locale}/dashboard/orders` },
     { label: "Users", href: `/${locale}/dashboard/users` },
     { label: "News", href: `/${locale}/dashboard/news` },

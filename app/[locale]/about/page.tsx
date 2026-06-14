@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { supabaseServer } from "@/lib/supabaseServer";
 import PartnersSlider from '@/components/about/PartnersSlider'
 import CurvedLinesBg from "@/components/CurvedLinesBg";
 
@@ -8,14 +9,21 @@ export const metadata = {
   description: 'Learn about DROV, our mission, vision, history, partners, and contact details.',
 }
 
-export default function AboutPage() {
+export default async function AboutPage() {
   // Update these to your real partner logos in /public/partners
-  const partners = [
-    { src: '/partners/elrazy.png', alt: 'el-razy' },
-    { src: '/partners/future.png', alt: 'future' },
-    { src: '/partners/riva.png', alt: 'riva' },
-    { src: '/partners/scott-edil.png', alt: 'scott-edil' },
-  ]
+const { data: partnersData } = await supabaseServer
+  .from("partners")
+  .select("name, slug, logo_url")
+  .eq("is_active", true)
+  .order("id", { ascending: true });
+
+const partners = (partnersData || [])
+  .filter((p) => p.logo_url)
+  .map((p) => ({
+    src: p.logo_url,
+    alt: p.name,
+    slug: p.slug,
+  }));
 
   // Update coordinates to your real office location
   const mapEmbedUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3219.8372164263046!2d43.99901807429978!3d36.194840572425946!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4007230014e0537b%3A0xd4d5a61833207dbf!2sDROV%20Company!5e0!3m2!1sen!2siq!4v1768024630953!5m2!1sen!2siq" width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade'

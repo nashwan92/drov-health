@@ -1,12 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import ProductCard from "@/components/ProductCard";
-
-const COMPANIES = ["RIVA PHARMA", "FUTURE", "El Razy Pharma", "SCOTT-EDIL"];
 
 const CATEGORIES = [
   "Tablet",
@@ -44,7 +42,6 @@ const cardVariants = {
   },
 };
 
-
 function ProductSkeleton() {
   return (
     <div className="rounded-2xl border bg-white p-4 animate-pulse">
@@ -58,13 +55,37 @@ function ProductSkeleton() {
 
 export default function ProductsPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const locale = (params.locale as string) || "en";
 
   const [products, setProducts] = useState<any[]>([]);
+  const [partners, setPartners] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [companyFilter, setCompanyFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
+
+  useEffect(() => {
+    async function loadPartners() {
+      const { data } = await supabase
+        .from("partners")
+        .select("id, name, slug")
+        .eq("is_active", true)
+        .order("name", { ascending: true });
+
+      setPartners(data || []);
+
+      const companySlug = searchParams.get("company");
+      if (companySlug && data) {
+        const matchedPartner = data.find((p) => p.slug === companySlug);
+        if (matchedPartner) {
+          setCompanyFilter(matchedPartner.name);
+        }
+      }
+    }
+
+    loadPartners();
+  }, [searchParams]);
 
   useEffect(() => {
     async function loadProducts() {
@@ -93,7 +114,6 @@ export default function ProductsPage() {
 
   return (
     <div className="space-y-10 px-4 sm:px-6 lg:px-10 xl:px-14">
-      {/* HEADER */}
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold">Our Products</h1>
         <p className="text-gray-500 max-w-xl mx-auto">
@@ -101,7 +121,6 @@ export default function ProductsPage() {
         </p>
       </div>
 
-      {/* FILTERS */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -115,8 +134,11 @@ export default function ProductsPage() {
             onChange={(e) => setCompanyFilter(e.target.value)}
           >
             <option value="all">All companies</option>
-            {COMPANIES.map((c) => (
-              <option key={c}>{c}</option>
+
+            {partners.map((partner) => (
+              <option key={partner.id} value={partner.name}>
+                {partner.name}
+              </option>
             ))}
           </select>
         </div>
@@ -130,13 +152,14 @@ export default function ProductsPage() {
           >
             <option value="all">All categories</option>
             {CATEGORIES.map((c) => (
-              <option key={c}>{c}</option>
+              <option key={c} value={c}>
+                {c}
+              </option>
             ))}
           </select>
         </div>
       </motion.div>
 
-      {/* GRID */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, i) => (

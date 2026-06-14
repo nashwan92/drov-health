@@ -4,7 +4,7 @@ import Link from "next/link";
 import PartnersSlider from "@/components/about/PartnersSlider";
 import NewsSlider from "@/components/home/NewsSlider";
 import HomeProductsPreview from "@/components/home/HomeProductsPreview";
-
+import { supabaseServer } from "@/lib/supabaseServer";
 import { t } from "@/lib/translations";
 
 
@@ -15,13 +15,19 @@ export default async function HomePage({
 }) {
   const { locale } = params;
 
-  const partners = [
-    { src: "/partners/elrazy.png", alt: "Elrazy" },
-    { src: "/partners/future.png", alt: "Future" },
-    { src: "/partners/riva.png", alt: "Riva" },
-        { src: '/partners/scott-edil.png', alt: 'scott-edil' },
+ const { data: partnersData } = await supabaseServer
+  .from("partners")
+  .select("name, slug, logo_url")
+  .eq("is_active", true)
+  .order("id", { ascending: true });
 
-  ];
+const partners = (partnersData || [])
+  .filter((p) => p.logo_url)
+  .map((p) => ({
+    src: p.logo_url,
+    alt: p.name,
+    slug: p.slug,
+  }));
 
   return (
     <main>
